@@ -1,0 +1,17 @@
+{
+  "name": "Ashi's Wardrobe",
+  "short_name": "Ashi's Wardrobe",
+  "description": "A visual digital wardrobe with AI-suggested, weather-aware outfits.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#faf8f5",
+  "theme_color": "#faf8f5",
+  "icons": [
+    {
+      "src": "/icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}
