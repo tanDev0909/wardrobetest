@@ -1,15 +1,17 @@
-// Browser Supabase client. Returns null when env vars are missing so the app
-// keeps working in its original in-memory mode (local dev, e2e tests).
+// Browser Supabase client. Returns null when env vars are missing (or
+// NEXT_PUBLIC_DISABLE_BACKEND=1, used by the e2e suite) so the app keeps
+// working in its original in-memory mode.
 
 import { createClient, type SupabaseClient } from "@supabase/supabase-js";
 
 const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
 const anonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+const disabled = process.env.NEXT_PUBLIC_DISABLE_BACKEND === "1";
 
 export const STORAGE_BUCKET = "wardrobe";
 
 export const supabase: SupabaseClient | null =
-  url && anonKey ? createClient(url, anonKey) : null;
+  url && anonKey && !disabled ? createClient(url, anonKey) : null;
 
 export const isBackendEnabled = supabase !== null;
 

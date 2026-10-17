@@ -7,9 +7,11 @@ import ItemGrid from "@/components/wardrobe/ItemGrid";
 import CategoryFilter, { type Filters } from "@/components/wardrobe/CategoryFilter";
 import EmptyState from "@/components/common/EmptyState";
 import Button from "@/components/common/Button";
+import ErrorState from "@/components/common/ErrorState";
+import Skeleton from "@/components/common/Skeleton";
 
 export default function WardrobePage() {
-  const { ownedItems, removeItem } = useWardrobe();
+  const { ownedItems, removeItem, status, error, reload } = useWardrobe();
   const [filters, setFilters] = useState<Filters>({
     category: "all",
     color: "all",
@@ -31,6 +33,28 @@ export default function WardrobePage() {
       }),
     [ownedItems, filters],
   );
+
+  if (status === "loading") {
+    return (
+      <div className="space-y-6">
+        <Header count={null} />
+        <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4">
+          {Array.from({ length: 8 }, (_, i) => (
+            <Skeleton key={i} className="aspect-[3/4]" />
+          ))}
+        </div>
+      </div>
+    );
+  }
+
+  if (status === "error") {
+    return (
+      <div className="space-y-6">
+        <Header count={null} />
+        <ErrorState message={`Couldn't load your wardrobe. ${error ?? ""}`} onRetry={reload} />
+      </div>
+    );
+  }
 
   if (ownedItems.length === 0) {
     return (
@@ -73,13 +97,15 @@ export default function WardrobePage() {
   );
 }
 
-function Header({ count }: { count: number }) {
+function Header({ count }: { count: number | null }) {
   return (
     <header className="flex items-end justify-between gap-4">
       <div>
         <h1 className="text-2xl font-semibold tracking-tight">Your wardrobe</h1>
         <p className="mt-1 text-sm text-muted">
-          {count} {count === 1 ? "piece" : "pieces"} · everything you own, in one place
+          {count === null
+            ? "Loading your pieces…"
+            : `${count} ${count === 1 ? "piece" : "pieces"} · everything you own, in one place`}
         </p>
       </div>
       <Link href="/add" className="hidden md:block">

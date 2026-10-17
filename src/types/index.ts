@@ -1,4 +1,5 @@
-// Domain types for Ashi's Wardrobe. State is in-memory only (resets on refresh).
+// Domain types for Ashi's Wardrobe. Items persist in Supabase when configured
+// (see src/lib/wardrobeRepo.ts); otherwise state is in-memory only.
 
 export type Category =
   | "top"
@@ -24,6 +25,8 @@ export interface Item {
   name: string;
   /** Object URL for uploaded photos. If absent, a GarmentSwatch is rendered. */
   imageUrl?: string;
+  /** Path in the Supabase `wardrobe` bucket, when the photo was uploaded. */
+  imagePath?: string;
   category: Category;
   /** Named colors, e.g. ["red", "white"]. First color drives the swatch. */
   colors: string[];

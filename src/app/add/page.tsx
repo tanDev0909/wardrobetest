@@ -23,15 +23,20 @@ const DEFAULT_TAGS: ItemTags = {
 
 export default function AddPage() {
   const router = useRouter();
-  const { addItem } = useWardrobe();
+  const { addItem, persistent } = useWardrobe();
 
   const [step, setStep] = useState<Step>("pick");
   const [previewUrl, setPreviewUrl] = useState<string | undefined>();
   const [tags, setTags] = useState<ItemTags>(DEFAULT_TAGS);
   const [name, setName] = useState("");
+  const [photo, setPhoto] = useState<File | undefined>();
+  const [saving, setSaving] = useState(false);
+  const [saveError, setSaveError] = useState<string | null>(null);
 
   const runTagging = async (file: File, preview: string) => {
     setPreviewUrl(preview);
+    setPhoto(file);
+    setSaveError(null);
     setStep("tagging");
     const result = await tagItem(file);
     setTags(result);
@@ -41,12 +46,14 @@ export default function AddPage() {
 
   const skipPhoto = () => {
     setPreviewUrl(undefined);
+    setPhoto(undefined);
+    setSaveError(null);
     setTags(DEFAULT_TAGS);
     setName("");
     setStep("review");
   };
 
-  const save = () => {
+  const save = async () => {
     const item: Item = {
       id: crypto.randomUUID(),
       name: name.trim() || suggestName(tags),
@@ -55,8 +62,15 @@ export default function AddPage() {
       owned: true,
       createdAt: Date.now(),
     };
-    addItem(item);
-    router.push("/");
+    setSaving(true);
+    setSaveError(null);
+    try {
+      await addItem(item, photo);
+      router.push("/");
+    } catch (err) {
+      setSaveError(err instanceof Error ? err.message : "Couldn't save. Try again.");
+      setSaving(false);
+    }
   };
 
   return (
@@ -64,8 +78,8 @@ export default function AddPage() {
       <header>
         <h1 className="text-2xl font-semibold tracking-tight">Add a piece</h1>
         <p className="mt-1 text-sm text-muted">
-          Snap or upload a photo — AI tags it for you. (Items last for this
-          session.)
+          Snap or upload a photo — AI tags it for you.
+          {!persistent && " (Items last for this session.)"}
         </p>
       </header>
 
@@ -87,17 +101,28 @@ export default function AddPage() {
 
           <TagChips tags={tags} onChange={setTags} />
 
+          {saveError && (
+            <p role="alert" className="text-sm font-medium text-accent">
+              {saveError}
+            </p>
+          )}
+
           <div className="flex items-center justify-end gap-3">
             <Button
               variant="ghost"
               onClick={() => {
                 setStep("pick");
                 setPreviewUrl(undefined);
+                setPhoto(undefined);
+                setSaveError(null);
               }}
+              disabled={saving}
             >
               Start over
             </Button>
-            <Button onClick={save}>Save to wardrobe</Button>
+            <Button onClick={save} disabled={saving}>
+              {saving ? "Saving…" : "Save to wardrobe"}
+            </Button>
           </div>
         </div>
       )}

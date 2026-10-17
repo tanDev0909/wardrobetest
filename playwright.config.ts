@@ -31,5 +31,7 @@ export default defineConfig({
     url: baseURL,
     timeout: 120_000,
     reuseExistingServer: !process.env.CI,
+    // Run against the in-memory store so tests never touch the real Supabase.
+    env: { NEXT_PUBLIC_DISABLE_BACKEND: "1" },
   },
 });

@@ -34,9 +34,9 @@ Without Supabase env vars the app runs in its original in-memory mode.
 
 - [x] **0. Scaffolding** — `@supabase/supabase-js`, `src/lib/supabase.ts`,
       `supabase/migrations/0001_init.sql`, `/api/health`, `vercel.json`, `.env.example`
-- [ ] **0b. Accounts (owner)** — GitHub repo, Supabase project + run migration,
+- [x] **0b. Accounts (owner)** — GitHub repo, Supabase project + run migration,
       enable anonymous sign-ins, Vercel project + env vars, Gemini key
-- [ ] **1. Persistence** — `store.tsx` loads/saves via Supabase (fallback: in-memory);
+- [x] **1. Persistence** — `store.tsx` loads/saves via Supabase (fallback: in-memory);
       `/add` resizes to ~1200px WebP, hashes, uploads to Storage, inserts row
 - [ ] **2. Ingest** — `scripts/ingest.ts`: folder of images + CSV/JSON → Storage + rows;
       run once to move `seed.ts` into the DB
