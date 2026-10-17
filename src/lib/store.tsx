@@ -90,7 +90,7 @@ interface WardrobeContextValue {
   /** True when items are saved to the backend (vs. this session only). */
   persistent: boolean;
   /** Saves the item (uploading `photo` when the backend is on). Throws on failure. */
-  addItem: (item: Item, photo?: File) => Promise<void>;
+  addItem: (item: Item, photo?: Blob, dedupeKey?: string) => Promise<void>;
   removeItem: (id: string) => void;
   updateItem: (id: string, patch: Partial<Item>) => void;
   setMood: (mood: Mood) => void;
@@ -133,8 +133,8 @@ export function WardrobeProvider({ children }: { children: ReactNode }) {
     status: state.status,
     error: state.error,
     persistent: isBackendEnabled,
-    addItem: async (item, photo) => {
-      const saved = isBackendEnabled ? await repo.createItem(item, photo) : item;
+    addItem: async (item, photo, dedupeKey) => {
+      const saved = isBackendEnabled ? await repo.createItem(item, photo, dedupeKey) : item;
       dispatch({ type: "add", item: saved });
     },
     removeItem: (id) => {

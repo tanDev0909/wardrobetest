@@ -40,7 +40,7 @@ Without Supabase env vars the app runs in its original in-memory mode.
       `/add` resizes to ~1200px WebP, hashes, uploads to Storage, inserts row
 - [ ] **2. Ingest** — `scripts/ingest.ts`: folder of images + CSV/JSON → Storage + rows
       (real data only; `seed.ts` is demo/e2e-only and never written to the DB)
-- [ ] **3. In-browser extraction** — `extractItems(file)` in `aiService.ts` using
+- [x] **3. In-browser extraction** — `extractItems(file)` in `aiService.ts` using
       SegFormer; review screen "Found N items"; colours from mask pixels
 - [ ] **4. Optional AI tags** — `/api/tag` with Gemini Flash-Lite on a 512px thumbnail;
       falls back to manual chips when quota is exhausted

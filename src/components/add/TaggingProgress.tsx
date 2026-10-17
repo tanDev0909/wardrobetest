@@ -2,16 +2,22 @@
 
 import { useEffect, useState } from "react";
 
-// Presentational only — the real timing comes from aiService.tagItem(). This
-// just animates a few reassuring steps so the "AI is looking at your photo"
-// moment feels alive rather than like an instant lookup.
+// Shows real progress when `status` is given (model download / garment
+// extraction); otherwise animates a few reassuring steps so the mocked
+// "AI is looking at your photo" moment feels alive.
 const STEPS = [
   "Looking at your photo…",
   "Detecting colors & pattern…",
   "Guessing category & formality…",
 ];
 
-export default function TaggingProgress({ previewUrl }: { previewUrl?: string }) {
+export default function TaggingProgress({
+  previewUrl,
+  status,
+}: {
+  previewUrl?: string;
+  status?: string;
+}) {
   const [step, setStep] = useState(0);
 
   useEffect(() => {
@@ -35,9 +41,9 @@ export default function TaggingProgress({ previewUrl }: { previewUrl?: string })
       )}
       <div className="flex items-center gap-2 text-sm font-medium text-accent">
         <span className="h-2 w-2 animate-ping rounded-full bg-accent" />
-        {STEPS[step]}
+        {status ?? STEPS[step]}
       </div>
-      <ul className="w-full max-w-xs space-y-1.5 text-left">
+      <ul className={status ? "hidden" : "w-full max-w-xs space-y-1.5 text-left"}>
         {STEPS.map((s, i) => (
           <li
             key={s}

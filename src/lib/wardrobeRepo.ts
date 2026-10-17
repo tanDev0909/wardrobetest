@@ -72,14 +72,17 @@ export class DuplicatePhotoError extends Error {
   }
 }
 
-/** Upload the (resized) photo if given, then insert the row. */
-export async function createItem(item: Item, photo?: File): Promise<Item> {
+/**
+ * Upload the (resized) photo if given, then insert the row. `dedupeKey`
+ * overrides the photo hash, e.g. "<original hash>:Shoes" for a cut-out.
+ */
+export async function createItem(item: Item, photo?: Blob, dedupeKey?: string): Promise<Item> {
   const sb = db();
   let imagePath: string | null = null;
   let imageHash: string | null = null;
 
   if (photo) {
-    imageHash = await sha256(photo);
+    imageHash = dedupeKey ?? (await sha256(photo));
     const { data: existing } = await sb
       .from("items")
       .select("id")

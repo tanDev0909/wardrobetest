@@ -89,6 +89,50 @@ export async function tagItem(file: File): Promise<ItemTags> {
   };
 }
 
+// --- Garment extraction (real, in-browser) ----------------------------------
+
+export interface ExtractedItem {
+  /** Stable per photo ("Top", "Shoes"…) — combined with the photo hash to dedupe. */
+  key: string;
+  name: string;
+  tags: ItemTags;
+  /** Transparent cut-out of just this garment. */
+  cutout: Blob;
+}
+
+export type { ExtractProgress } from "./extract";
+
+/**
+ * Find each garment in a photo (top, pants, shoes, bag…) and cut it out.
+ * Runs SegFormer in the browser — free, private, ~29 MB model cached after the
+ * first use. Returns [] when nothing is found (e.g. a flat-lay product shot),
+ * so callers fall back to treating the whole photo as one item.
+ *
+ * Pattern/formality/season are guesses for now; Phase 4 adds a cheap vision
+ * LLM call to fill them in.
+ */
+export async function extractItems(
+  file: File,
+  onProgress?: (p: import("./extract").ExtractProgress) => void,
+): Promise<ExtractedItem[]> {
+  if (process.env.NEXT_PUBLIC_DISABLE_EXTRACTION === "1") return [];
+  const { extractGarments } = await import("./extract");
+  const garments = await extractGarments(file, onProgress);
+  return garments.map((g) => ({
+    key: g.key,
+    name: [g.colors[0], g.name.toLowerCase()].filter(Boolean).join(" ").replace(/^\w/, (m) => m.toUpperCase()),
+    cutout: g.cutout,
+    tags: {
+      category: g.category,
+      colors: g.colors,
+      pattern: "solid",
+      fabric: null,
+      formality: g.category === "dress" ? "smart-casual" : "casual",
+      season: ["spring", "summer", "autumn", "winter"],
+    },
+  }));
+}
+
 // --- Styling ----------------------------------------------------------------
 
 // Inspiration pieces the user doesn't own yet — all clean product-only photos.

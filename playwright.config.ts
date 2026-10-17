@@ -31,7 +31,8 @@ export default defineConfig({
     url: baseURL,
     timeout: 120_000,
     reuseExistingServer: !process.env.CI,
-    // Run against the in-memory store so tests never touch the real Supabase.
-    env: { NEXT_PUBLIC_DISABLE_BACKEND: "1" },
+    // Run against the in-memory store so tests never touch the real Supabase,
+    // and skip the 29 MB garment model (covered by a manual live check).
+    env: { NEXT_PUBLIC_DISABLE_BACKEND: "1", NEXT_PUBLIC_DISABLE_EXTRACTION: "1" },
   },
 });
